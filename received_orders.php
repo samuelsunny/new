@@ -6,6 +6,7 @@ include("functions.php");
 
 $user_data = check_login($con);
 $user_id = $user_data['user_id'];
+$checker = 0;
 
 if($_SERVER['REQUEST_METHOD'] == "GET")
 {
@@ -23,12 +24,18 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
             if($result && mysqli_num_rows($result) > 0)
             {
                 $orders_data = mysqli_fetch_all($result);
+                // if(count(orders_data) == 0)
+                // {
+                //     $checker = 1;
+                //     header("Location: noorder.php");
+                //     die; 
+                // }
             }
-            // else
-            // {
-            //     header("Location: addproducts.php");
-            //     die;
-            // }
+            else
+            {
+                 header("Location: noorder.php");
+                die; 
+            }
         }
     
     else{
@@ -153,6 +160,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
       
     <div class="container">
       <div class="row mt-4">
+
           <table class="table">
             <thead>
                 <tr>
@@ -179,7 +187,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
               </tr>
               <?php } ?>
             </tbody>
-          </table>     
+          </table>  
       </div>
     </div>
       <footer class="footer">
