@@ -112,8 +112,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="viewusers.php">View all users</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="add_harbor_stock.php">Add stock</a></li>
-                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="addharbour.php">Add a harbor</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="addcontainer.php">Add container</a></li>
@@ -153,10 +151,12 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             </div>
         </div>
     </nav>
-      
-    <div class="row justify-content-center mt-5">
+</div>
+ 
+<div class="container-fluid">
+    <div class="row justify-content-center mt-2">
         <div class="col-6">
-            <h1 class="display-4 fs-2 text-center"><b>Container Management System</b></h1>
+            <h1 class="display-4 fs-2 text-center"><b>My orders</b></h1>
         </div>
     </div>
   
@@ -164,7 +164,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
       
 
       <div class="row mt-4">
-          <h1 class="display-4 fs-3 "><b>Your orders</b></h1>  
           <table class="table">
             <thead>
                 <tr>
@@ -208,6 +207,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             </tbody>
           </table>     
       </div>
+    </div>
       <footer class="footer">
         <div class=" text-center bg-light">
           <a href="index.php">

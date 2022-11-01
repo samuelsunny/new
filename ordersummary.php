@@ -64,7 +64,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     // $query = "insert into products (product_name,product_brand,product_type,quantity) values ('$product_name','$brand','$type','$product_barcode','$product_weight','$product_image')";
 
     // mysqli_query($con, $query);
-    header("Location: test.php");
+    header("Location: success.php");
     die;
     
 
@@ -138,8 +138,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="viewusers.php">View all users</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="add_harbor_stock.php">Add stock</a></li>
-                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="addharbour.php">Add a harbor</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="addcontainer.php">Add container</a></li>
@@ -179,6 +177,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             </div>
         </div>
     </nav>
+</div>
       
     <div class="row justify-content-center mt-5">
         <div class="col-6">

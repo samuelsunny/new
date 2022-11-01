@@ -7,134 +7,8 @@ include("functions.php");
 $user_data = check_login($con);
 $user_id = $user_data['user_id'];
 
-if($_SERVER['REQUEST_METHOD'] == "GET")
-{
-    // When the user clicks on the create account button
-   
-    
 
-        // Reading from the data base
-        $query = "select * from manufacturer_orders where exporter_company_id = '{$user_id}'";
 
-        $result = mysqli_query($con, $query);
-
-        if($result)
-        {
-            if($result && mysqli_num_rows($result) > 0)
-            {
-                $orders_data = mysqli_fetch_all($result);
-            }
-            else
-            {
-                header("Location: noorder.php");
-                die;
-            }
-        }
-    
-    else{
-        echo "problem in getting data";
-    }
-
-}
-
-if($_SERVER['REQUEST_METHOD'] == "POST")
-{
-    print_r($_POST);
-    $check_flag = 0;
-    $status = $_POST['status'];
-    $product_id = $_POST['product_id'];
-    $exporter_id = $_POST['exporter_id'];
-    $query = "select productQuantity from harbor_stock_room where exporterId = '{$user_id}' and productId = '{$product_id}'";
-    $result = mysqli_query($con, $query);
-    $order_data = mysqli_fetch_all($result);
-    if(count($order_data) == 0)
-    {
-        $existing_quantity = 0;
-        $check_flag = 1;
-    }
-    else
-    {
-        echo "existing quantity:";
-        print_r($order_data);
-        $existing_quantity = $order_data[0][0];
-    }
-   
-
-    $query = "select quantity,harborId from manufacturer_orders where product_id = '{$product_id}' and exporter_company_id = '{$user_id}'";
-    $result = mysqli_query($con, $query);
-    $order_data = mysqli_fetch_all($result);
-    $accepted_quantity = $order_data[0][0];
-    $harborId = $order_data[0][1];
-    $new_quantity = (int)$existing_quantity + (int)$accepted_quantity;
-    echo $existing_quantity,$new_quantity;
-
-    if($check_flag == 1)
-    {
-        $query = "insert into harbor_stock_room (harborId,productId,productQuantity,exporterId) values ('{$harborId}', '{$product_id}', '{$new_quantity}', '{$exporter_id}')";
-
-        mysqli_query($con, $query);
-    }
-    else
-    {
-        $query = "update harbor_stock_room set productQuantity ='{$new_quantity}' WHERE productId = '{$product_id}' and harborId = '{$harborId}'";
-
-        mysqli_query($con, $query);
-    }
-    
-    // Updating the quantity in products table
-
-    $query = "update products set quantity ='{$new_quantity}' WHERE product_id = '{$product_id}'";
-
-    mysqli_query($con, $query);
-    
-  
-    $query = "delete from manufacturer_orders where product_id = '{$product_id}' and exporter_company_id = '{$user_id}'";
-
-    mysqli_query($con, $query);
-
-   
-    header("Location: index.php");
-    die;
-    // if ($status == "accept")
-    // {
-
-    // }
-    // // print_r($real_data['product_id']);
-    // $product_id = $real_data['product_id'];
-    // $product_name = $real_data['product_name'];
-
-    // $manufacturer_id = $real_data['manufacturerId'];
-    // // echo $manufacturer_id;
-    // $quantity = $real_data['quantity'];
-
-    // $query = "insert into manufacturer_orders (exporter_company_id,exporter_name,product_id,product_name,manufacturer_id,quantity) values ('{$user_id}', '{$exporter_name}', '{$product_id}', '{$product_name}','{$manufacturer_id}','{$quantity}')";
-
-    // mysqli_query($con, $query);
-    // header("Location: index.php");
-    // die;
-    // $product_id = $_POST['product_id'];
-    // // When the user clicks on the buy product button
-    // $query = "select * from products where product_id='{$product_id}'";
-
-    // $result = mysqli_query($con, $query);
-    // // print_r( $result);
-
-    // if($result)
-    // {
-    //     if($result && mysqli_num_rows($result) > 0)
-    //     {
-    //         $product_data = mysqli_fetch_all($result);
-    //     }
-    // 
-
-    // else{
-    //     echo "problem in getting data";
-    // }
-    
-
-    //     // Reading from the data base
-        
-}
 
 
 ?>
@@ -241,56 +115,30 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         </div>
     </nav>
 </div>
-      
+
+<div class="container-fluid">
     <div class="row justify-content-center mt-5">
-        <div class="col-6">
-            <h1 class="display-4 fs-2 text-center"><b>Container Management System</b></h1>
+        <div class="col-2 text-right">
+            <img class="img" src="greentick.png" width = "150px" height="150px">
+        </div>
+        <div class="col-5">
+            <h1 class="display-4 fs-2 text-left mt-4"><b>Order accepted and will be delivered successfully!</b></h1>
+        </div>
         </div>
     </div>
+    <div class="row justify-content-center mt-2">
+        <div class="col-12 text-center">
+            <a href="index.php">
+                <button type="button" class="btn btn-lg btn-success">Ok</button>
+            </a>
+        </div>
+    </div>
+    
+</div>
   
   
       
 
-      <div class="row mt-4">
-          <h1 class="display-4 fs-3 "><b>Your orders</b></h1>  
-          <table class="table">
-            <thead>
-                <tr>
-                <th scope="col">Order_id</th>
-                <th scope="col">Product_name</th>
-                <th scope="col">Exporter_name</th>
-                <th scope="col">Quantity</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php for ($row = 0; $row < count($orders_data); $row++) {?>
-              <tr>
-                <th scope="row"><?php echo $orders_data[$row][0] ?></th>
-                <td><?php echo $orders_data[$row][4] ?></td>
-                <td><?php echo $orders_data[$row][3] ?></td>
-                <td><?php echo $orders_data[$row][7] ?></td>
-                <td>
-                    <form action= "man_received_orders.php" method = "post">
-                                    <input type="hidden"  name="product_id" value="<?php echo $orders_data[$row][4]; ?>"/>
-                                    <input type="hidden"  name="exporter_id" value="<?php echo $orders_data[$row][1]; ?>"/>
-                                    <input type="hidden"  name="status" value="<?php echo "accept"; ?>"/>
-                                    <button type="submit" class="btn btn-success">
-                                    <?php echo "accept" ?>
-                                    </button>
-                                </form>
-                </td>    
-              </tr>
-              <?php } ?>
-            </tbody>
-          </table>     
-      </div>
-      <footer class="footer">
-        <div class=" text-center bg-light">
-          <a href="index.php">
-              <button class="btn btn-danger  m-2" type="button">Back</button>
-          </a>
-        </div>
-      </footer>
       
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
   </body>

@@ -108,7 +108,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
 
     mysqli_query($con, $query);
 
-    header("Location: index.php");
+    header("Location: success_shipping.php");
     die;
     // When the user clicks on the create account button
     // $harborName = $_POST['harbourName'];
@@ -147,7 +147,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
   </head>
   <body>
   <div class="container-fluid">
-    <nav class="navbar navbar-expand-lg bg-light">
+  <nav class="navbar navbar-expand-lg bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">C S M</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
@@ -199,8 +199,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                         <li><a class="dropdown-item" href="addusers.php">Add users</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="viewusers.php">View all users</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="add_harbor_stock.php">Add stock</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="addharbour.php">Add a harbor</a></li>
                         <li><hr class="dropdown-divider"></li>
@@ -284,7 +282,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                             </div>
 
                             <div class="mb-2">
-                                <label for="exampleFormControlInput1" class="form-label">Arrival date (in DD/MM/YYYY format)</label>
+                                <label for="exampleFormControlInput1" class="form-label">Arrival date (in MM/DD/YYYY format)</label>
                                 <input type="text" class="form-control" id="exampleFormControlInput1" name = "arrival_date">
                                 <!-- <input type="text" class="form-control" id="exampleFormControlInput1" name = "grossCubeFeet"> -->
                             </div>

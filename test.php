@@ -48,32 +48,35 @@ echo "problem in getting data";
 
 if($_SERVER['REQUEST_METHOD'] == "GET")
 {
-    // print_r( $_GET['product_id']);
-    $product_name = $_GET['product_name'];
-    // Reading from the data base
-    $query = "select * from products where product_name = '{$product_name}' ORDER BY quantity DESC";
-
-    $result = mysqli_query($con, $query);
-    // print_r( $result);
-
-    if($result)
+    if (sizeof($_GET,1) > 0)
     {
-        if($result && mysqli_num_rows($result) > 0)
-        {
-            $selected_product_data = mysqli_fetch_all($result);
-            // print_r( $selected_product_data);
-            $selected_product_flag = 1;
-        }
-    }
+        // print_r( $_GET['product_id']);
+        $product_name = $_GET['product_name'];
+        // Reading from the data base
+        $query = "select * from products where product_name = '{$product_name}' ORDER BY quantity DESC";
 
-    else{
-        echo "problem in getting data";
+        $result = mysqli_query($con, $query);
+        // print_r( $result);
+
+        if($result)
+        {
+            if($result && mysqli_num_rows($result) > 0)
+            {
+                $selected_product_data = mysqli_fetch_all($result);
+                // print_r( $selected_product_data);
+                $selected_product_flag = 1;
+            }
+        }
+
+        else{
+            echo "problem in getting data";
+        }
     }
 }
 
 if($_SERVER['REQUEST_METHOD'] == "POST")
 {
-    print_r($_POST);
+    // print_r($_POST);
     // $product_id = $_POST['product_id'];
     // // When the user clicks on the buy product button
     // $query = "select * from products where product_id='{$product_id}'";
@@ -120,7 +123,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
   </head>
   <body>
   <div class="container-fluid">
-    <nav class="navbar navbar-expand-lg bg-light">
+  <nav class="navbar navbar-expand-lg bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">C S M</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
@@ -173,8 +176,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="viewusers.php">View all users</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="add_harbor_stock.php">Add stock</a></li>
-                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="addharbour.php">Add a harbor</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="addcontainer.php">Add container</a></li>
@@ -214,6 +215,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             </div>
         </div>
     </nav>
+    </div>
     
       
     <div class="container-fluid  mt-2">
@@ -256,7 +258,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                     <tr>
                     <td class="text-center">
                     <input class="text-center form-check-input" type="checkbox" value="<?php echo $selected_product_data[$row][0],"/",$selected_product_data[$row][1],"/",$selected_product_data[$row][2],"/",$selected_product_data[$row][3],
-                                                                                                    "/",$selected_product_data[$row][7],"/",$selected_product_data[$row][9],"/",$selected_product_data[$row][10]; ?>"  id="checkbox" name="check_box">
+                                                                                                    "/",$selected_product_data[$row][8],"/",$selected_product_data[$row][9],"/",$selected_product_data[$row][10]; ?>"  id="checkbox" name="check_box">
                     </td>
                     <th scope="row" class="text-center"><?php echo $selected_product_data[$row][0]; ?></th>
                     

@@ -86,7 +86,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
         if($result && mysqli_num_rows($result) > 0)
         {
             $order_data = mysqli_fetch_all($result);
-            print_r( $order_data);
+            // print_r( $order_data);
             // $selected_product_flag = 1;
         }
     }
@@ -98,7 +98,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
 
 if($_SERVER['REQUEST_METHOD'] == "POST")
 {
-    print_r($_POST);
+    // print_r($_POST);
     $buyerOrderId = $_POST['buyerOrderId'];
     $packId = $_POST['packId'];
     $grossWeight = $_POST['grossWeight'];
@@ -111,7 +111,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     $harborId = $real_data['harborId'];
     $loadingDate = $real_data['loadingDate'];
     $containerId = $real_data['containerId'];
-    echo "Container:",$containerId;
+    // echo "Container:",$containerId;
     if(!empty($_FILES["image_file"]["name"])) { 
         // echo "Inside image code!";
         // Get file info 
@@ -127,14 +127,15 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             $imgContent = addslashes(file_get_contents($image)); 
         }
     }
-    $query = "select productQuantity from harbor_stock where productId = '{$product_id}'";
+    $query = "select productQuantity from harbor_stock_room where productId = '{$product_id}'";
     $result = mysqli_query($con, $query);
     $order_data = mysqli_fetch_all($result);
     // print_r($order_data[0][0]);
     $existing_quantity = (int)$order_data[0][0];
     $new_quantity = (int)$existing_quantity - (int)$quantity;
+    // echo $new_quantity;
 
-    $query = "update harbor_stock set productQuantity ='{$new_quantity}' WHERE exporterId = '{$user_id}'";
+    $query = "update harbor_stock_room set productQuantity ='{$new_quantity}' WHERE productId = '{$product_id}'";
 
     mysqli_query($con, $query);
 
@@ -148,7 +149,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     mysqli_query($con, $query);
     
 
-    header("Location: index.php");
+    header("Location: successloading.php");
     die;
     // When the user clicks on the create account button
     // $harborName = $_POST['harbourName'];
@@ -187,7 +188,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
   </head>
   <body>
   <div class="container-fluid">
-    <nav class="navbar navbar-expand-lg bg-light">
+  <nav class="navbar navbar-expand-lg bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">C S M</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
@@ -239,8 +240,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                         <li><a class="dropdown-item" href="addusers.php">Add users</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="viewusers.php">View all users</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="add_harbor_stock.php">Add stock</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="addharbour.php">Add a harbor</a></li>
                         <li><hr class="dropdown-divider"></li>
@@ -329,25 +328,20 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                             </div>
 
                             <div class="mb-4">
-                                <label for="exampleFormControlInput1" class="form-label">Buyer order Id</label>
-                                <input type="text" class="form-control" id="exampleFormControlInput1" name = "buyerOrderId" value=" <?php echo $order_data[0][0]; ?>" readonly>
-                            </div>
-
-                            <div class="mb-4">
                                 <label for="exampleFormControlInput1" class="form-label">Quantity </label>
                                 <input type="text" class="form-control" id="exampleFormControlInput1" name = "Quantity" value=" <?php echo $order_data[0][6]; ?>" readonly>
                             </div>
                             
                             <div class="mb-2">
                                 <label for="exampleFormControlInput1" class="form-label">pack Id</label>
-                                <input type="text" class="form-control" id="exampleFormControlInput1" name = "packId">
+                                <input type="text" class="form-control" id="exampleFormControlInput1" name = "packId" value=" <?php echo $order_data[0][0]; ?>">
                             </div>
                             <div class="mb-2">
-                                <label for="exampleFormControlInput1" class="form-label">Gross weight</label>
+                                <label for="exampleFormControlInput1" class="form-label">Gross weight (in Kilograms)</label>
                                 <input type="text" class="form-control" id="exampleFormControlInput1" name = "grossWeight">
                             </div>
                             <div class="mb-2">
-                                <label for="exampleFormControlInput1" class="form-label">Gross height (in Cubicfeet)</label>
+                                <label for="exampleFormControlInput1" class="form-label">Gross height (in Foot)</label>
                                 <input type="hidden" class="form-control" id="exampleFormControlInput1" name = "product_id" value="<?php echo $order_data[0][2]; ?>">
                                 <input type="text" class="form-control" id="exampleFormControlInput1" name = "grossCubeFeet">
                             </div>
@@ -396,7 +390,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         function setJson()
         {
             var currentdate = new Date();
-            var date = currentdate.getDate().toString()+"/"+currentdate.getMonth().toString()+"/"+currentdate.getFullYear().toString()
+            var date = currentdate.getMonth().toString()+"/"+currentdate.getDate().toString()+"/"+currentdate.getFullYear().toString()
             var poster =  document.getElementById("poster");
             var order_data = {
                     "harborId"    : parseInt(harborId),
