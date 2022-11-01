@@ -150,15 +150,19 @@ session_start();
         <div class="row justify-content-center">
             
             <div class="col-8">
-                <div class="card text-center mt-1 p-2">
+                <div class="card mt-1 p-2">
                     <div class="card-body"> 
                        <form method = "post">
                             <div class="mb-4">
-                                <input type="email" class="form-control"  id = "username" name = "username"  placeholder="Create your username">
+                            <label for="exampleFormControlInput1" class="form-label">Create username</label>
+
+                                <input type="email" class="form-control"  id = "username" name = "username"  placeholder="">
                             </div>
             
                             <div class="mb-4">
-                                <input type="password" class="form-control" id = "password" name = "password" placeholder="Create your password">
+                            <label for="exampleFormControlInput1" class="form-label">Create password</label>
+
+                                <input type="password" class="form-control" id = "password" name = "password" placeholder="">
                             </div>
 
                             <div class="mb-2">
@@ -205,7 +209,9 @@ session_start();
                             
 
                             <div class="mb-4">
-                                <input type="text" class="form-control" id = "user_contact_number" name = "user_contact_number" placeholder="Enter your contact number">
+                            <label for="exampleFormControlInput1" class="form-label">Enter contact number</label>
+
+                                <input type="text" class="form-control" id = "user_contact_number" name = "user_contact_number" placeholder="">
                             </div>
                             <div id="sender">
                                 <button type="submit" class="btn btn-primary mb-2" id="button" onclick="reviewInfo()">Create account</button>
