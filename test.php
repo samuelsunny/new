@@ -53,7 +53,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
         // print_r( $_GET['product_id']);
         $product_name = $_GET['product_name'];
         // Reading from the data base
-        $query = "select * from products where product_name = '{$product_name}' ORDER BY quantity DESC";
+        $query = "select * from products where product_name = '{$product_name}'";
 
         $result = mysqli_query($con, $query);
         // print_r( $result);
@@ -266,25 +266,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                     <td class="w-25 text-center">
                         <img class="img" src="data:image/png;charset=utf8;base64,<?php echo base64_encode($selected_product_data[$row][6]); ?>" width = "150px" height="150px">
                     </td>
-                    <?php if($selected_product_data[$row][7] > 0) 
-                    { ?>
-                        <td class="text-left">
-                            <p><?php echo $selected_product_data[$row][2]," ",$selected_product_data[$row][1]; ?></p>
-                            <p>Type: <?php echo $selected_product_data[$row][3]; ?></p>
-                            <p> <b>In stock:</b>  <?php echo $selected_product_data[$row][7]; ?></p>
-                            <p> <b>Price:</b>  <?php echo "$",$selected_product_data[$row][8]; ?></p>
-                            <p> <b>Exported by:</b> <?php echo $selected_product_data[$row][10]; ?></p>
-                        </td>
-                    <?php }?>
-                    <?php if($selected_product_data[$row][7] <= 0) {?>
+                    
                         <td class="text-left">
                         <p><?php echo $selected_product_data[$row][2]," ",$selected_product_data[$row][1]; ?></p>
                             <p>Type: <?php echo $selected_product_data[$row][3]; ?></p>
                             <p> <b><?php echo "Out of stock!"; ?> </b></p>
-                            <p> <b>Price:</b>  <?php echo "$",$selected_product_data[$row][8]; ?></p>
-                            <p> <b>Exported by:</b> <?php echo $selected_product_data[$row][10]; ?></p>
+                            <p> <b>Price:</b>  <?php echo "$",$selected_product_data[$row][7]; ?></p>
+                            <p> <b>Exported by:</b> <?php echo $selected_product_data[$row][9]; ?></p>
                         </td>
-                    <?php }?>
                     
                     </tr>
                     <?php }?>

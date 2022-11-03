@@ -9,7 +9,6 @@ $user_id = $user_data['user_id'];
 
 if($_SERVER['REQUEST_METHOD'] == "GET")
 {
-    // When the user clicks on the create account button
    
     
 
@@ -39,14 +38,26 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
 
 if($_SERVER['REQUEST_METHOD'] == "POST")
 {
-    print_r($_POST);
+    // print_r($_POST);
     $check_flag = 0;
     $status = $_POST['status'];
     $product_id = $_POST['product_id'];
     $exporter_id = $_POST['exporter_id'];
-    $query = "select productQuantity from harbor_stock_room where exporterId = '{$user_id}' and productId = '{$product_id}'";
+    // $harbor_id = $_POST['harbor_id'];
+
+    
+    $query = "select harborId, exporter_company_id,quantity from manufacturer_orders where product_id = '{$product_id}' and exporter_company_id = '{$user_id}' order by order_id desc limit 1";
+    $result = mysqli_query($con, $query);
+    $data = mysqli_fetch_all($result);
+    $harbor_id =  $data[0][0];
+    $exporter_id = $data[0][1];
+    $accepted_quantity = $data[0][2];
+
+
+    $query = "select productQuantity from harbor_stock_room where exporterId = '{$exporter_id}' and productId = '{$product_id}'  and harborId = '{$harbor_id}'";
     $result = mysqli_query($con, $query);
     $order_data = mysqli_fetch_all($result);
+    
     if(count($order_data) == 0)
     {
         $existing_quantity = 0;
@@ -55,40 +66,43 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     else
     {
         echo "existing quantity:";
-        print_r($order_data);
+        // print_r($order_data);
         $existing_quantity = $order_data[0][0];
     }
    
 
-    $query = "select quantity,harborId from manufacturer_orders where product_id = '{$product_id}' and exporter_company_id = '{$user_id}'";
-    $result = mysqli_query($con, $query);
-    $order_data = mysqli_fetch_all($result);
-    $accepted_quantity = $order_data[0][0];
-    $harborId = $order_data[0][1];
+    // $query = "select quantity,harborId from manufacturer_orders where product_id = '{$product_id}' and exporter_company_id = '{$user_id}'";
+    // $result = mysqli_query($con, $query);
+    // $order_data = mysqli_fetch_all($result);
+    // $accepted_quantity = $order_data[0][0];
+    // $harborId = $order_data[0][1];
     $new_quantity = (int)$existing_quantity + (int)$accepted_quantity;
-    echo $existing_quantity,$new_quantity;
+    // echo $existing_quantity,$new_quantity,"Quant done",$harbor_id;
+    // print_r($data);
 
     if($check_flag == 1)
     {
-        $query = "insert into harbor_stock_room (harborId,productId,productQuantity,exporterId) values ('{$harborId}', '{$product_id}', '{$new_quantity}', '{$exporter_id}')";
+        $query = "insert into harbor_stock_room (harborId,productId,productQuantity,exporterId) values ('{$harbor_id}', '{$product_id}', '{$new_quantity}', '{$exporter_id}')";
 
         mysqli_query($con, $query);
+        $check_flag = 0;
+
     }
     else
     {
-        $query = "update harbor_stock_room set productQuantity ='{$new_quantity}' WHERE productId = '{$product_id}' and harborId = '{$harborId}'";
+        $query = "update harbor_stock_room set productQuantity ='{$new_quantity}' WHERE productId = '{$product_id}' and harborId = '{$harbor_id}' and exporterId = '{$exporter_id}'";
 
         mysqli_query($con, $query);
     }
     
     // Updating the quantity in products table
 
-    $query = "update products set quantity ='{$new_quantity}' WHERE product_id = '{$product_id}'";
+    // $query = "update products set quantity ='{$new_quantity}' WHERE product_id = '{$product_id}'";
 
-    mysqli_query($con, $query);
+    // mysqli_query($con, $query);
     
-  
-    $query = "delete from manufacturer_orders where product_id = '{$product_id}' and exporter_company_id = '{$user_id}'";
+    // deleting the inventory order from manufacturer_orders table
+    $query = "delete from manufacturer_orders where product_id = '{$product_id}' and exporter_company_id = '{$exporter_id}' and harborid = '{$harbor_id}'";
 
     mysqli_query($con, $query);
 
@@ -146,7 +160,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     <title>Bootstrap demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
   </head>
-  <body>
+  <body >
     <div class="container-fluid">
     <nav class="navbar navbar-expand-lg bg-light">
         <div class="container-fluid">
@@ -241,7 +255,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         </div>
     </nav>
 </div>
-      
+
+<div class="container">
     <div class="row justify-content-center mt-5">
         <div class="col-6">
             <h1 class="display-4 fs-2 text-center"><b>Container Management System</b></h1>
@@ -266,13 +281,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             <?php for ($row = 0; $row < count($orders_data); $row++) {?>
               <tr>
                 <th scope="row"><?php echo $orders_data[$row][0] ?></th>
-                <td><?php echo $orders_data[$row][4] ?></td>
+                <td><?php echo $orders_data[$row][5] ?></td>
                 <td><?php echo $orders_data[$row][3] ?></td>
                 <td><?php echo $orders_data[$row][7] ?></td>
                 <td>
                     <form action= "man_received_orders.php" method = "post">
-                                    <input type="hidden"  name="product_id" value="<?php echo $orders_data[$row][4]; ?>"/>
+                                    <input type="hidden"  name="product_id" value="<?php echo $orders_data[$row][4]; ?>" />
                                     <input type="hidden"  name="exporter_id" value="<?php echo $orders_data[$row][1]; ?>"/>
+                                    <input type="hidden"  name="harbor_id" id="harbor_id" value="abc" onload="setHarborId('<?php echo $orders_data[$row][4]; ?>')"/>
                                     <input type="hidden"  name="status" value="<?php echo "accept"; ?>"/>
                                     <button type="submit" class="btn btn-success">
                                     <?php echo "accept" ?>
@@ -284,6 +300,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             </tbody>
           </table>     
       </div>
+</div>
       <footer class="footer">
         <div class=" text-center bg-light">
           <a href="index.php">
@@ -291,7 +308,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
           </a>
         </div>
       </footer>
-      
+      <script>
+        function setHarborId(product_id)
+        {
+            data = JSON.parse(localStorage.getItem(parseInt(product_id)))
+            console.log(data,product_id,parseInt(product_id));
+            document.getElementById('harbor_id').value = data["harborId"];
+        }
+      </script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
   </body>
 </html>

@@ -319,8 +319,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                     <td class="text-left">
                         <p><?php echo $selected_product_data[$row][2]," ",$selected_product_data[$row][1]; ?></p>
                         <p>Type: <?php echo $selected_product_data[$row][3]; ?></p>
-                        <p> <b>Price:</b>  <?php echo "$",$selected_product_data[$row][8]; ?></p>
-                        <p> <b>Exported by:</b> <?php echo $selected_product_data[$row][10]; ?></p>
+                        <p> <b>Price:</b>  <?php echo "$",$selected_product_data[$row][7]; ?></p>
+                        <p> <b>Exported by:</b> <?php echo $selected_product_data[$row][9]; ?></p>
                     </td>
                     
                     </tr>
@@ -413,6 +413,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         {
             var subjectIdNode = document.getElementById('harbor');
             harborId = subjectIdNode.options[subjectIdNode.selectedIndex].value;
+            // localStorage.setItem("HarborId", harborId);
             console.log("The selected name=" + harborId);
 
         }

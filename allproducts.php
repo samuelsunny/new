@@ -190,7 +190,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
                     <td class="text-center"><?php echo $products_data[$row][1]; ?></td>
                     <td class="text-center"><?php echo $products_data[$row][3]; ?></td>
                     <td class="text-center"><?php echo "$",$products_data[$row][8]; ?></td>
-                    <td class="text-center"><?php echo $products_data[$row][10]; ?></td>
+                    <td class="text-center"><?php echo $products_data[$row][9]; ?></td>
                     </tr>
                     <?php }?>
                 </tbody>
