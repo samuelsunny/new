@@ -44,6 +44,8 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     print_r($real_data);
 
 
+
+
     for ($x = 0; $x < count($real_data); $x++) {
         
         $id = $real_data[$x]['product_id'];
@@ -54,8 +56,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         $exporter_id = $real_data[$x]['exporter_id'];
         $exporter_name = $real_data[$x]['exporter_name'];
         $warehouseId = $real_data[$x]['warehouseId'];
+        $status      = "Not loaded";
         // echo $real_data[$x]['product_id'];
-        $query = "insert into orders (user_id,product_id,product_name,product_brand,product_type,quantity,exporter_id,exporter_name,warehouseId) values ('{$user_id}','{$id}','{$name}','{$brand}','{$type}','{$quantity}','{$exporter_id}','{$exporter_name}','{$warehouseId}')";
+        $query = "insert into orders (user_id,product_id,product_name,product_brand,product_type,quantity,exporter_id,exporter_name,warehouseId,status) values ('{$user_id}','{$id}','{$name}','{$brand}','{$type}','{$quantity}','{$exporter_id}','{$exporter_name}','{$warehouseId}','{$status}')";
 
         mysqli_query($con, $query);
         
@@ -191,7 +194,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         {
 
             var quantity = document.getElementsByName("quantity").value;
-            var warehouseId = document.getElementById("checkbox").value;
+            var warehouseId = document.getElementById("warehouse").value;
             var poster = document.getElementById("poster");
 
             data[0]['quantity'] = quantity;
@@ -282,24 +285,19 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         </div>
     </div>
     <div class="row justify-content-center">
-        <div class="col-6">
-        <table class="table table-image">
-                <tbody>
-                    <?php for ($row = 0; $row < count($warehouse_data); $row++) { ?>
-                    <tr>
-                        <td class="text-center">
-                        <input class="text-center form-check-input" type="checkbox" value="<?php echo $warehouse_data[$row][0]; ?>"  id="checkbox" name="check_box">
-                        </td>                    
-                        <td class="text-left">
-                            <p><?php echo $warehouse_data[$row][2]; ?></p>
-                            <p> <b>Address:</b> <?php echo $warehouse_data[$row][6]; ?></p>
-                        </td>
-                    
-                    </tr>
-                    <?php }?>
-                </tbody>
-                </table>
-        </div>
+             <div class="col-4 p-2">
+                    <div class="dropdown">
+                    <select class="form-select" aria-label="Default select example"  onchange="setWarehouse()" id = "warehouse">
+                        <option selected>Choose warehouse from the list</option>
+                        <?php for ($row = 0; $row < count($warehouse_data); $row++) { ?>
+                            
+                            <option  name="warehouse" value="<?php echo $warehouse_data[$row][0]; ?>" >
+                                <?php echo $warehouse_data[$row][2]; ?>
+                            </option>
+                        <?php }?>
+                    </select>
+                    </div>                  
+            </div>
     </div>
       <script>
         showData();
@@ -315,7 +313,30 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             </div>
         </footer>
     </form>
-      
+      <script>
+        var warehouseId = 0;
+        function setWarehouse()
+        {
+            var subjectIdNode = document.getElementById('warehouse');
+            warehouseId = subjectIdNode.options[subjectIdNode.selectedIndex].value;
+            console.log("The selected name=",warehouseId);
+            setJson();
+        }
+
+        function setJson()
+        {
+            var poster =  document.getElementById("poster");
+            var warehouse_data = {
+                    "warehouseId"    : harborId,
+                    }
+            json_data = JSON.stringify(warehouse_data);
+            poster.value = json_data;
+            // console.log(poster.value);
+
+
+        }
+
+      </script>
         
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
   </body>

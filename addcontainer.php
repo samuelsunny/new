@@ -7,6 +7,20 @@ $user_data = check_login($con);
 $user_id = $user_data['user_id'];
 
 
+$get_harbors = "select harborId,harborName from harbors";
+
+$result = mysqli_query($con, $get_harbors);
+// print_r( $result);
+
+if($result)
+{
+    if($result && mysqli_num_rows($result) > 0)
+    {
+        $harbors_data = mysqli_fetch_all($result);
+        // print_r($harbors_data);
+    }
+}
+
 $get_exporters = "select user_id,user_name from users where account_type = 'Exporter'";
 
 $result = mysqli_query($con, $get_exporters);
@@ -31,7 +45,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     print_r($_POST);
     $real_data = json_decode($_POST['total'],true);
     $code = $_POST['ISO6346_code'];
-    $exporterId = $real_data['exporterId'];
+    $sourceHarborId = $real_data['harborId'];
+    $destinationHarborId = "0000";
+
     // echo $code;
 
     if(!empty($_FILES["image_file"]["name"])) { 
@@ -50,7 +66,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         }
     }
 
-    $query = "insert into containers (ISO6346_Code,ownerCompanyId,containerImage,sourceHarbor,destinationHarbor) values ('{$code}', '{$exporterId}','{$imgContent}',0,0)";
+    $query = "insert into containers (ISO6346_Code,containerImage,sourceHarborId,destinationHarborId) values ('{$code}','{$imgContent}','{$sourceHarborId}','{$destinationHarborId}')";
 
     mysqli_query($con, $query);
 
@@ -205,13 +221,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                             </div>
 
                             <div class="mb-4">
+                                <label for="exampleFormControlInput1" class="form-label">Assign to harbor: </label>
                                 <div class="dropdown">
-                                    <select class="form-select" aria-label="Default select example" onchange="setExporter()" id="exporter">
-                                        <option selected>Choose exporter from the list</option>
-                                        <?php for ($row = 0; $row < count($exporters_data); $row++) { ?>
+                                    <select class="form-select" aria-label="Default select example" onchange="setHarbor()" id="harbor">
+                                        <option selected>Choose harbor from the list</option>
+                                        <?php for ($row = 0; $row < count($harbors_data); $row++) { ?>
                                             
-                                            <option value="<?php echo $exporters_data[$row][0]; ?>" >
-                                                <?php echo $exporters_data[$row][1]; ?>
+                                            <option value="<?php echo $harbors_data[$row][0]; ?>" >
+                                                <?php echo $harbors_data[$row][1]; ?>
                                             </option>
                                         <?php }?>
                                     </select>
@@ -238,7 +255,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     </div>
 
     <script>
-        var exporterId = 0;
+        var harborId = 0;
         var container_ISO_code = document.getElementById('ISO6346_code').value;
         var productId = 0;
 
@@ -248,18 +265,18 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             console.log("The selected name=" + container_ISO_code);
 
         }
-        function setExporter()
+        function setHarbor()
         {
-            var subjectIdNode = document.getElementById('exporter');
-            exporterId = subjectIdNode.options[subjectIdNode.selectedIndex].value;
-            console.log("The selected name=" + exporterId);
+            var subjectIdNode = document.getElementById('harbor');
+            harborId = subjectIdNode.options[subjectIdNode.selectedIndex].value;
+            console.log("The selected name=" + harborId);
 
         }
         function setJson()
         {
             var poster =  document.getElementById("poster");
             var order_data = {
-                    "exporterId": parseInt(exporterId)
+                    "harborId": parseInt(harborId)
                     }
             json_data = JSON.stringify(order_data);
             poster.value = json_data;

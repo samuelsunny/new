@@ -6,8 +6,23 @@ session_start();
 
     $user_data = check_login($con);
 
+    $get_harbors = "select harborId,harborName from harbors";
+
+    $result = mysqli_query($con, $get_harbors);
+    // print_r( $result);
+
+    if($result)
+    {
+        if($result && mysqli_num_rows($result) > 0)
+        {
+            $harbors_data = mysqli_fetch_all($result);
+            // print_r($harbors_data);
+        }
+    }
+
     if($_SERVER['REQUEST_METHOD'] == "POST")
     {
+        // print_r($_POST);
         // When the user clicks on the submit button
         $name     = $_POST['name'];
         $emailId      = $_POST['emailId'];
@@ -16,11 +31,15 @@ session_start();
         $contact_number= $_POST['contact_number'];
         $user_id = $user_data['user_id'];
 
+        $real_data = json_decode($_POST['total'],true);
+        $harborId = $real_data['harborId'];
+        echo $harborId;
+
         if((!empty($name)) && (!empty($emailId)) && (!empty($contact_name))&&
             (!empty($warehouse_address))&& (!empty($contact_number)))
         {
             // Saving to data base
-            $query = "insert into warehouses (Company_Id,name,emailId,contact_name,contact_number,warehouse_address) values ('$user_id','$name','$emailId','$contact_name','$contact_number','$warehouse_address')";
+            $query = "insert into warehouses (harbor_Id,name,emailId,contact_name,contact_number,warehouse_address) values ('$harborId','$name','$emailId','$contact_name','$contact_number','$warehouse_address')";
 
             mysqli_query($con, $query);
 
@@ -150,9 +169,24 @@ session_start();
                     <div class="card-body"> 
                        <form method = "post">
                             <div class="mb-4">
-                            <label for="exampleFormControlInput1" class="form-label">Create the warehouse name</label>
+                                    <div class="dropdown">
+                                        <select class="form-select" aria-label="Default select example" onchange="setHarbor()" id="harbor">
+                                        <option selected>Choose harbor from the list</option>
+                                        <?php for ($row = 0; $row < count($harbors_data); $row++) { ?>
+                                            
+                                            <option value="<?php echo $harbors_data[$row][0];?>" >
+                                                <?php echo $harbors_data[$row][1]; ?>
+                                            </option>
+                                        <?php }?>
 
-                                <input type="text" class="form-control"  id = "name" name = "name"  placeholder="">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="exampleFormControlInput1" class="form-label">Create the warehouse name</label>
+
+                                <input type="text" class="form-control"  id = "name" name = "name"  placeholder="" >
                             </div>
                             <div class="mb-4">
                             <label for="exampleFormControlInput1" class="form-label">Create email Id</label>
@@ -191,7 +225,9 @@ session_start();
                                 <input type="text" class="form-control" id = "contact_number" name = "contact_number" placeholder="Enter the contact number">
                             </div>
                             <div id="sender">
-                                <button type="submit" class="btn btn-primary mb-2" id="button">Add warehouse</button>
+                                <input type="hidden" name="total" id="poster" value="abc"/>  
+
+                                <button type="submit" onclick = "setJson()" class="btn btn-primary mb-2" id="button">Add warehouse</button>
                             </div>
                         </form>
                     </div>
@@ -202,6 +238,27 @@ session_start();
         
     </div>
     <script>
+         function setHarbor()
+        {
+            var subjectIdNode = document.getElementById('harbor');
+            harborId = subjectIdNode.options[subjectIdNode.selectedIndex].value;
+            console.log("The selected name=",harborId);
+            setJson();
+        }
+
+        function setJson()
+        {
+            var poster =  document.getElementById("poster");
+            var warehouse_data = {
+                    "harborId"    : harborId,
+                    }
+            json_data = JSON.stringify(warehouse_data);
+            poster.value = json_data;
+            console.log(poster.value);
+
+
+        }
+
         var checkAccountType = 0;
         var  user_data       = {}
         // the selector will match all input controls of type :checkbox

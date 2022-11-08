@@ -6,19 +6,22 @@ include("functions.php");
 $user_data = check_login($con);
 $user_id = $user_data['user_id'];
 
-$get_containers = "select containerId,ISO6346_Code from containers WHERE ownerCompanyId = '{$user_id}'";
+$fetched_containers = 0;
 
-$result = mysqli_query($con, $get_containers);
-// print_r( $result);
 
-if($result)
-{
-    if($result && mysqli_num_rows($result) > 0)
-    {
-        $containers_data = mysqli_fetch_all($result);
-        // print_r($harbors_data);
-    }
-}
+// $get_containers = "select containerId,ISO6346_Code from containers WHERE ownerCompanyId = '{$user_id}'";
+
+// $result = mysqli_query($con, $get_containers);
+// // print_r( $result);
+
+// if($result)
+// {
+//     if($result && mysqli_num_rows($result) > 0)
+//     {
+//         $containers_data = mysqli_fetch_all($result);
+//         // print_r($harbors_data);
+//     }
+// }
 
 $get_harbors = "select harborId,harborName from harbors";
 
@@ -72,44 +75,127 @@ echo "problem in getting data";
 }
 
 if($_SERVER['REQUEST_METHOD'] == "GET")
-{
-    // print_r( $_GET['product_id']);
-    $order_id = $_GET['oid'];
-    // Reading from the data base
-    $query = "select * from orders where order_id = '{$order_id}'";
-
-    $result = mysqli_query($con, $query);
-    // print_r( $result);
-
-    if($result)
+{   
+    // echo sizeof($_GET,1);
+    // print_r( $_GET);
+    if (sizeof($_GET,1) == 1)
     {
-        if($result && mysqli_num_rows($result) > 0)
+        $order_id = $_GET['oid'];
+        // Reading from the data base
+        $query = "select * from orders where order_id = '{$order_id}'";
+
+        $result = mysqli_query($con, $query);
+        // print_r( $result);
+
+        if($result)
         {
-            $order_data = mysqli_fetch_all($result);
-            // print_r( $order_data);
-            // $selected_product_flag = 1;
+            if($result && mysqli_num_rows($result) > 0)
+            {
+                $order_data = mysqli_fetch_all($result);
+                // print_r( $order_data);
+                // $selected_product_flag = 1;
+            }
         }
+
+        $query = "select warehouseId from orders where order_id = '{$order_id}'";
+        $result = mysqli_query($con, $query);
+        $warehousedata = mysqli_fetch_all($result);
+        $warehouseId = $warehousedata[0][0];
+        
+        $query = "select harbor_Id from warehouses where warehouse_id = '{$warehouseId}'";
+        $result = mysqli_query($con, $query);
+        $sourceHarbordata = mysqli_fetch_all($result);
+        $sourceHarborId = $sourceHarbordata[0][0];
+
+        // echo $warehouseId,$sourceHarborId;
+
+        $get_harbors = "select harborId,harborName from harbors where harborId <> '{$sourceHarborId}'";
+
+        $result = mysqli_query($con, $get_harbors);
+        // print_r( $result);
+
+        if($result)
+        {
+            if($result && mysqli_num_rows($result) > 0)
+            {
+                $harbors_data = mysqli_fetch_all($result);
+                // print_r($harbors_data);
+            }
+        }
+
+
+    }
+    if (sizeof($_GET,1) > 1)
+    {
+        // print_r( $_GET['product_id']);
+        $harborid = $_GET['hid'];
+        // Reading from the data base
+        $query = "select * from containers where sourceHarborId = '{$harborid}'";
+
+        $result = mysqli_query($con, $query);
+        // print_r( $result);
+
+        if($result)
+        {
+            if($result && mysqli_num_rows($result) > 0)
+            {
+                $containers_data = mysqli_fetch_all($result);
+                // print_r( $selected_product_data);
+                $fetched_containers = 1;
+            }
+        }
+        $order_id = $_GET['oid'];
+        // Reading from the data base
+        $query = "select * from orders where order_id = '{$order_id}'";
+
+        $result = mysqli_query($con, $query);
+        // print_r( $result);
+
+        if($result)
+        {
+            if($result && mysqli_num_rows($result) > 0)
+            {
+                $order_data = mysqli_fetch_all($result);
+                // print_r( $order_data);
+                // $selected_product_flag = 1;
+            }
+        }
+
     }
 
-    else{
-        echo "problem in getting data";
-    }
+   
 }
+
+
 
 if($_SERVER['REQUEST_METHOD'] == "POST")
 {
-    // print_r($_POST);
-    $buyerOrderId = $_POST['buyerOrderId'];
+    print_r($_POST);
+    $buyerOrderId = $_POST['Product_id'];
     $packId = $_POST['packId'];
     $grossWeight = $_POST['grossWeight'];
     $grossCubeFeet = $_POST['grossCubeFeet'];
     $quantity = $_POST['Quantity'];
     $product_id = $_POST['product_id'];
     $onShip = "NO";
+    
+
 
     $real_data = json_decode($_POST['total'],true);
     $harborId = $real_data['harborId'];
     $loadingDate = $real_data['loadingDate'];
+    $status = $real_data['status'];
+
+    // Changing the date format
+    $formatDate = explode("-",$loadingDate);
+    $c = $formatDate[0];
+    $formatDate[0] = $formatDate[1];
+    $formatDate[1] = $formatDate[2];
+    $formatDate[2] = $c;
+    $formattedDate = implode("-",$formatDate);
+    $loadingDate = $formattedDate;
+    // echo "Formatted date:",$b;
+
     $containerId = $real_data['containerId'];
     // echo "Container:",$containerId;
     if(!empty($_FILES["image_file"]["name"])) { 
@@ -133,15 +219,37 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     // print_r($order_data[0][0]);
     $existing_quantity = (int)$order_data[0][0];
     $new_quantity = (int)$existing_quantity - (int)$quantity;
-    // echo $new_quantity;
+    echo $new_quantity;
 
     $query = "update harbor_stock_room set productQuantity ='{$new_quantity}' WHERE productId = '{$product_id}'";
 
     mysqli_query($con, $query);
 
-    $query = "update products set quantity ='{$new_quantity}' WHERE product_id = '{$product_id}'";
+    $query = "update orders set status ='{$status}' WHERE order_id = '{$buyerOrderId}'";
 
     mysqli_query($con, $query);
+
+    // getting warehouse Id of the order
+    $query = "select warehouseId from orders where order_id = '{$buyerOrderId}'";
+    $result = mysqli_query($con, $query);
+    $warehousedata = mysqli_fetch_all($result);
+    $warehouseId = $warehousedata[0][0];
+
+    // getting warehouse harbor Id (To be set as detination for container)
+    $query = "select harbor_Id from warehouses where warehouse_id = '{$warehouseId}'";
+    $result = mysqli_query($con, $query);
+    $destinationHarbordata = mysqli_fetch_all($result);
+    $destinationHarborId = $destinationHarbordata[0][0];
+
+
+
+    $query = "update containers set destinationHarborId ='{$destinationHarborId}' WHERE containerId = '{$containerId}'";
+
+    mysqli_query($con, $query);
+    // $status = "Loaded";
+    // $query = "update orders set status ='{$status}' WHERE order_id = '{$order_id}'";
+
+    // mysqli_query($con, $query);
 
 
     $query = "insert into loading_orders (containerId,buyerOrderId,harborId,packId,grossWeight,grossCubeFeet,loadingImage,loadingDate,onShip) values ('{$containerId}', '{$buyerOrderId}', '{$harborId}', '{$packId}', '{$grossWeight}', '{$grossCubeFeet}', '{$imgContent}', '{$loadingDate}',0)";
@@ -185,8 +293,10 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bootstrap demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    
   </head>
   <body>
+ 
   <div class="container-fluid">
   <nav class="navbar navbar-expand-lg bg-light">
         <div class="container-fluid">
@@ -287,7 +397,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                 <img src="loadingcontainer.jpg" class="img-fluid" alt="Responsive image">
                 
                     <ul>
-                        <li><p class="mt-4"> Fill the details to add a harbour stock room</p> </li>
+                        <li><p class="mt-4"> Fill the details after loading the order into container</p> </li>
                     </ul>
             </div>
             <div class="col-6">
@@ -295,31 +405,42 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                     <div class="card-body"> 
                         <form action="loadingorder.php" method = "post" enctype="multipart/form-data">
                             <div class="mb-4">
-                                <div class="dropdown">
-                                    <select class="form-select" aria-label="Default select example" onchange="setHarbor()" id="harbor">
+                                    <label for="exampleFormControlInput1" class="form-label">Seelct your harbor</label>
+                                    <div class="dropdown">
+                                    <select class="form-select" aria-label="Default select example" onchange="location = this.value;" onclick="setHarbor()" id="harbor">
                                         <option selected>Choose harbor from the list</option>
                                         <?php for ($row = 0; $row < count($harbors_data); $row++) { ?>
-                                            
-                                            <option value="<?php echo $harbors_data[$row][0]; ?>" >
+                                            <option name="<?php echo $harbors_data[$row][0]; ?>" value="http://localhost/Container-Scheduling-and-management/loadingorder.php?hid=<?php echo $harbors_data[$row][0]; ?>&oid=<?php echo $order_id; ?>">
                                                 <?php echo $harbors_data[$row][1]; ?>
                                             </option>
                                         <?php }?>
                                     </select>
-                                </div>
+                                    </div>                  
+                                    
                             </div>
-
+                                    
                             <div class="mb-4">
+                                <label for="exampleFormControlInput1" class="form-label">Choose Container at the  harbor</label>
+
                                 <div class="dropdown">
                                     <select class="form-select" aria-label="Default select example" onchange="setContainer()" id="container">
-                                        <option selected>Choose Container from the list</option>
+                                        <option selected>Choose container</option>
+                                        <?php if($fetched_containers == 1) { ?>
                                         <?php for ($row = 0; $row < count($containers_data); $row++) { ?>
                                             
-                                            <option value="<?php echo $containers_data[$row][0]; ?>" >
+                                            <option value="<?php echo $containers_data[$row][0];?><?php echo "+"?><?php echo $containers_data[$row][3]; ?>" >
                                                 <?php echo $containers_data[$row][1]; ?>
                                             </option>
                                         <?php }?>
+                                        <?php }?>
+
                                     </select>
                                 </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="exampleFormControlInput1" class="form-label">Order Id</label>
+                                <input type="text" class="form-control" id="exampleFormControlInput1" name = "Product_id" value=" <?php echo $order_data[0][0] ?>" readonly>
                             </div>
 
                             <div class="mb-4">
@@ -345,6 +466,10 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
                                 <input type="hidden" class="form-control" id="exampleFormControlInput1" name = "product_id" value="<?php echo $order_data[0][2]; ?>">
                                 <input type="text" class="form-control" id="exampleFormControlInput1" name = "grossCubeFeet">
                             </div>
+                            <div class="mb-2">
+                                <label for="exampleFormControlInput1" class="form-label">Click on the calendar to select date</label>
+                                <input type="date" id="date" class="form-control" name="date">
+                            </div>
                             <div class="mb-3">
                                 <label for="formFile" class="form-label">Choose the container image file</label>
                                 <input class="form-control" type="file" id="formFile" name="image_file">
@@ -362,6 +487,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     </div>
 
     <script>
+         
         var containerId = 0;
         var harborId = 0;
         var productId = 0;
@@ -370,14 +496,17 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         {
             var subjectIdNode = document.getElementById('harbor');
             harborId = subjectIdNode.options[subjectIdNode.selectedIndex].value;
-            // console.log("The selected name=" + harborId);
+            harborId.split("?")[0];
+            console.log("The selected name=" + harborId);
 
         }
         function setContainer()
         {
             var subjectIdNode = document.getElementById('container');
-            containerId = subjectIdNode.options[subjectIdNode.selectedIndex].value;
-            // console.log("The selected name=" + exporterId);
+            info = subjectIdNode.options[subjectIdNode.selectedIndex].value;
+            containerId = info.split("+")[0];
+            harborId = info.split("+")[1];
+            console.log("The selected name=" + containerId.split("+")[0],harborId);
 
         }
         function setProduct()
@@ -390,12 +519,14 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         function setJson()
         {
             var currentdate = new Date();
+            var selected_date = document.getElementById("date").value;
             var date = currentdate.getMonth().toString()+"/"+currentdate.getDate().toString()+"/"+currentdate.getFullYear().toString()
             var poster =  document.getElementById("poster");
             var order_data = {
                     "harborId"    : parseInt(harborId),
-                    "loadingDate"  : date,
-                    "containerId": parseInt(containerId),
+                    "loadingDate" : selected_date,
+                    "containerId" : parseInt(containerId),
+                    "status"      : "Loaded"
                     }
             json_data = JSON.stringify(order_data);
             poster.value = json_data;

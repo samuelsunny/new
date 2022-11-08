@@ -5,15 +5,53 @@ include("connection.php");
 include("functions.php");
 
 $user_data = check_login($con);
+$user_id = $user_data['user_id'];
+$checker = 0;
+
+if($_SERVER['REQUEST_METHOD'] == "GET")
+{
+    // When the user clicks on the create account button
+   
+    
+
+        // Reading from the data base
+        $query = "select * from orders";
+
+        $result = mysqli_query($con, $query);
+
+        if($result)
+        {
+            if($result && mysqli_num_rows($result) > 0)
+            {
+                $orders_data = mysqli_fetch_all($result);
+                // if(count(orders_data) == 0)
+                // {
+                //     $checker = 1;
+                //     header("Location: noorder.php");
+                //     die; 
+                // }
+            }
+            else
+            {
+                 header("Location: noorder.php");
+                die; 
+            }
+        }
+    
+    else{
+        echo "problem in getting data";
+    }
+
+}
+
 
 ?>
-
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Home page</title>
+    <title>Bootstrap demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
   </head>
   <body>
@@ -47,7 +85,7 @@ $user_data = check_login($con);
                         Exporter
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="received_loading_orders.php">Received orders</a></li>
+                        <li><a class="dropdown-item" href="received_orders.php">Received orders</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="manufacturerorder.php">Order inventory</a></li>
                     </ul>
@@ -84,7 +122,7 @@ $user_data = check_login($con);
                         Orders
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="received_loading_orders.php">Load container</a></li>
+                        <li><a class="dropdown-item" href="received_orders.php">Load container</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="shipping_orders.php">Sea shipping order</a></li>
                         <li><hr class="dropdown-divider"></li>
@@ -102,7 +140,7 @@ $user_data = check_login($con);
             </ul>
             
                 <span class="align-middle mr-2">
-                    <h1 class="display-4 fs-5 text-center ">Welcome, <?php echo $user_data['user_name']; ?> </h1>
+                    <h1 class="display-4 fs-5 text-center ">Welcome, <?php echo $user_data['user_name']; ?> &nbsp; </h1>
                 </span>
                 <a href="logout.php">
                     <button class="btn btn-warning  ml-2" type="submit">Log out</button>
@@ -110,40 +148,93 @@ $user_data = check_login($con);
             </div>
         </div>
     </nav>
-    
-    <div class="row justify-content-center mt-5">
+</div>
+      
+    <div class="row justify-content-center mt-2">
         <div class="col-6">
-            <h1 class="display-4 fs-2 text-center"><b>Container Management System</b></h1>
-            <h3 class="display-6 fs-2 text-center mt-5">Better container management, better commerce</p>
-            <hr/>
-            <div class="row justify-content-center">
-                <div class="col-8 mt-4">
-                <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action active">Container management                </a>
-                <a href="#" class="list-group-item list-group-item-action">Container tracking</a>
-                <a href="#" class="list-group-item list-group-item-action">Exporter-importer marketplace</a>
-            </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6">
-            <img src="home1.png" class="img-fluid" alt="...">
+            <h1 class="display-4 fs-2 text-center"><b>Received orders for loading</b></h1>
         </div>
     </div>
+  
+  
+      
+    <div class="container">
+      <div class="row mt-4">
 
-    <!-- <div class="row justify-content-center ">
-        <a href="products.php">
-            <div class="card bg-light" style="width: 15rem;height: 10rem; ">
-                <div class="card-body text-decoration-none">
-                    <h1 class="card-text mt-10 display-4 fs-3 text-center">Products</p>
-                </div>
-            </div>
-        </a>
-    </div> -->
+          <table class="table">
+            <thead>
+                <tr>
+                <th scope="col" class="text-center">Order Id</th>
+                <th scope="col" class="text-center">Product name</th>
+                <th scope="col" class="text-center">Product brand</th>
+                <th scope="col" class="text-center">Product type</th>
+                <th scope="col" class="text-center">Quantity</th>
+                <th scope="col" class="text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php for ($row = 0; $row < count($orders_data); $row++) {?>
+              <tr>
+                <th scope="row" class="text-center"><?php echo $orders_data[$row][0] ?></th>
+                <td class="text-center"><?php echo $orders_data[$row][3] ?></td>
+                <td class="text-center"><?php echo $orders_data[$row][4] ?></td>
+                <td class="text-center"><?php echo $orders_data[$row][5] ?></td>
+                <td class="text-center"><?php echo $orders_data[$row][6] ?></td>
+                <td class="text-center">
+                    <?php 
+                        if($orders_data[$row][10] == "Loaded")
+                        { ?>
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-success" disabled>
+                                        <?php echo $orders_data[$row][10] ?>
+                                    </button>
+                                </div>
+                            </div>
+                    <?php } ?>
 
-   
+                    <?php 
+                        if($orders_data[$row][10] == "Not loaded")
+                        { ?>
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-danger" disabled>
+                                        <?php echo $orders_data[$row][10] ?>
+                                    </button>
+                                </div>
+                            </div>
 
+                            <td>
+                                <a href="http://localhost/Container-Scheduling-and-management/loadingorder.php?oid=<?php echo $orders_data[$row][0]; ?>">
+                                    <button type="button" class="btn btn-primary"> Load  </button>   
+                                </a> 
+                            </td>
+                    <?php } ?>
+                </td>
+                <td class="text-center">
+                    <?php 
+                        if($orders_data[$row][10] == "Not Loaded")
+                        { ?>
+                            <a href="http://localhost/Container-Scheduling-and-management/loadingorder.php?oid=<?php echo $orders_data[$row][0]; ?>">
+                            <button type="button" class="btn btn-danger"> Load  </button>   
+                            </a> 
+                        <?php } ?>   
+                </td>
+              </tr>
+              <?php } ?>
+            </tbody>
+          </table>  
+      </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+      <footer class="footer">
+        <div class=" text-center bg-light">
+          <a href="index.php">
+              <button class="btn btn-success  m-2" type="button">Back</button>
+          </a>
+        </div>
+      </footer>
+      
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
   </body>
 </html>
+
