@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
     
 
         // Reading from the data base
-        $query = "select * from orders";
+        $query = "select * from orders where user_id = '{$user_id}'";
 
         $result = mysqli_query($con, $query);
 
@@ -38,9 +38,9 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
             }
         }
     
-    else{
-        echo "problem in getting data";
-    }
+        else{
+            echo "problem in getting data";
+        }
 
 }
 
@@ -85,7 +85,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
                         Exporter
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="received_orders.php">Received orders</a></li>
+                        <li><a class="dropdown-item" href="received_loading_orders.php">Received orders</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="manufacturerorder.php">Order inventory</a></li>
                     </ul>
@@ -114,6 +114,20 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
                         <li><a class="dropdown-item" href="addcontainer.php">Add container</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="addmanufacturer.php">Add manufacturer</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="addtrucks.php">Add trucks</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="addtruckingcompanies.php">Add trucking company</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="adddrivers.php">Add driver</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="addship.php">Add ships</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="addshippingcompanies.php">Add shipping company</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="adddrivers.php">Add driver</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="add_FFC.php">Add freight forwarding company</a></li>
                     </ul>
                 </li>
 
@@ -122,13 +136,29 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
                         Orders
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="received_orders.php">Load container</a></li>
+                        <li><a class="dropdown-item" href="received_loading_orders.php">Load container</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="shipping_orders.php">Sea shipping order</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="index.php">Truck shipping order</a></li>
+                        <li><a class="dropdown-item" href="arrived_status.php">Ships arrival</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="truckingorder.php">Truck shipping order</a></li>
                     </ul>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Trucking and warehouse access
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="orders_trucking.php">Orders for trucking company</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="orders_warehouse.php">Orders for warehouses</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="orders_driver.php">Orders for drivers</a></li>
+                    </ul>
+                </li>
+                
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Manufacturer
@@ -140,7 +170,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
             </ul>
             
                 <span class="align-middle mr-2">
-                    <h1 class="display-4 fs-5 text-center ">Welcome, <?php echo $user_data['user_name']; ?> &nbsp; </h1>
+                    <h1 class="display-4 fs-5 text-center ">Welcome, <?php echo $user_data['user_name']; ?> </h1>
                 </span>
                 <a href="logout.php">
                     <button class="btn btn-warning  ml-2" type="submit">Log out</button>
